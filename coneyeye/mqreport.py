@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import fnmatch, logging, logtool, requests, retryp
+import fnmatch, logging, logtool, requests
 from addict import Dict
 from flattendict import flatten_dict
 
@@ -56,7 +56,6 @@ def pattern_match (key, patterns):
       return True
   return False
 
-# @retryp.retryp (expose_last_exc = True)
 @logtool.log_call
 def mqreport (mp_conn, ignore_queues = None):
   stats = Dict ()

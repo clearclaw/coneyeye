@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import binascii, collections, fnmatch, logging, logtool, string
+import collections, logging, logtool
 from addict import Dict
 
 LOG = logging.getLogger (__name__)

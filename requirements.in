@@ -1,5 +1,6 @@
-python-statsd
-pyrabbit
+statsd
 logtool
-rainbow-logging-handler
-raven
+clip.py
+requests
+path.py
+addict

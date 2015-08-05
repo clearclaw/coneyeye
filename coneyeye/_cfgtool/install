@@ -1,0 +1,5 @@
+#! /bin/sh
+
+install -d -g root -o root -m 0755 -p /etc/coneyeye
+install -D -g root -o root -m 0644 -p -t /etc/coneyeye *.templ
+install -D -g root -o root -m 0644 -p coneyeye /etc/cfgtool/module.d/coneyeye

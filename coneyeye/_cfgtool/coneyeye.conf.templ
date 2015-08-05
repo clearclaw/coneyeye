@@ -1,0 +1,21 @@
+# Base of the URL to connect to the RabbitMQ admin APIs
+# eg http://foo:15672/
+rabbitmq_apiurl = "${rabbitmq_admin_url}"
+
+# RabbitMQ Admin API credentials
+rabbitmq_apiuser = "${rabbigmq_admin_user}"
+rabbitmq_apipasswd = "${rabbitmq_admin_passwd}"
+
+# Number of minutes between each report
+delay = "${coneyeye_delay}"
+
+# Glob-style (fnmatch) list of queues to ignore
+# eg: *.celery@*,*.celeryev.*,*pidbox
+suppress_queues = "${coneyeye_suppress_queues}"
+
+# StatsD target 
+statsd_host = "${statsd_host}"
+statsd_port = "${statsd_port}"
+
+# Prefix string to put at the start of all metrics
+statsd_prefix = "${coneyeye_prefix}"
