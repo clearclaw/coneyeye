@@ -38,6 +38,7 @@ setup (
                         for line in file ("requirements.txt").readlines ()],
     entry_points = {
         "console_scripts": [
+            "coneyeye = coneyeye.main:main",
         ],
     },
 )

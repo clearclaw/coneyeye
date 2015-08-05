@@ -1,10 +1,10 @@
 # Base of the URL to connect to the RabbitMQ admin APIs
 # eg http://foo:15672/
-rabbitmq_apiurl = "${rabbitmq_admin_url}"
+rabbitmq_adminapi_url = "${rabbitmq_adminapi_url}"
 
 # RabbitMQ Admin API credentials
-rabbitmq_apiuser = "${rabbigmq_admin_user}"
-rabbitmq_apipasswd = "${rabbitmq_admin_passwd}"
+rabbitmq_adminapi_user = "${rabbigmq_adminapi_user}"
+rabbitmq_adminapi_passwd = "${rabbitmq_adminapi_passwd}"
 
 # Number of minutes between each report
 delay = "${coneyeye_delay}"
@@ -13,7 +13,7 @@ delay = "${coneyeye_delay}"
 # eg: *.celery@*,*.celeryev.*,*pidbox
 suppress_queues = "${coneyeye_suppress_queues}"
 
-# StatsD target 
+# StatsD target
 statsd_host = "${statsd_host}"
 statsd_port = "${statsd_port}"
 

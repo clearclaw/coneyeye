@@ -1,17 +1,17 @@
 #! /usr/bin/env python
 
+from __future__ import absolute_import
 import fnmatch, logging, logtool, requests
 from addict import Dict
-from flattendict import flatten_dict
+from .flattendict import flatten_dict
 
 LOG = logging.getLogger (__name__)
 logging.basicConfig (level = logging.WARN)
 
 @logtool.log_call
 def get_data (mq_conn, endpoint):
-  url = "http://{host}:{port}/{endpoint}".format (
-    endpoint = endpoint, **mq_conn)
-  rc = requests.get (url, auth = (mq_conn.user, mq_conn.passwd))
+  url = "{url}{endpoint}".format (endpoint = endpoint, **mq_conn)
+  rc = requests.get (url, auth = (mq_conn["user"], mq_conn["passwd"]))
   if isinstance (rc.json (), list):
     return [Dict (flatten_dict (i)) for i in rc.json ()]
   return Dict (flatten_dict (rc.json ()))
