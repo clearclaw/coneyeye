@@ -1,23 +1,15 @@
 #! /usr/bin/env python
 
-try:
-  import pyver
-except ImportError:
-  import pip
-  pip.main (['install', 'pyver'])
-  import pyver # pylint: disable=W0611
 
 from setuptools import setup, find_packages
-import glob
-
-__version__, __version_info__ = pyver.get_version (pkg = "coneyeye",
-                                                   public = True)
+import glob, versioneer
 
 setup (
     name = "coneyeye",
-    version = __version__,
+    version = versioneer.get_version (),
     description = "Daemon to map RabbitMQ stats into StatsD",
     long_description = file ("README.rst").read (),
+    cmdclass = versioneer.get_cmdclass (),
     classifiers = [],
     keywords = "RabbitMQ, StatsD, daemon",
     author = "J C Lawrence",
