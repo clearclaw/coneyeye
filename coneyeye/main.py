@@ -1,22 +1,48 @@
 #! /usr/bin/env python
 
 from __future__ import absolute_import
-import json, logging, logging.config, logtool, statsd, setproctitle, sys, time
+import json, logging, logging.config, logtool, raven
+import statsd, setproctitle, sys, time
 from configobj import ConfigObj
 from .mqreport import mqreport
+from ._version import get_versions
 
 LOG = logging.getLogger (__name__)
 DEFAULT_PROCNAME = "coneyeye"
 DEFAULT_CONF = "/etc/coneyeye/coneyeye.conf"
 DEFAULT_LOGCONF = "/etc/coneyeye/logging.conf"
 
-class ConfigurationException (Exception):
+class InitialiseException (Exception):
+  pass
+
+class RuntimeException (Exception):
   pass
 
 @logtool.log_call
-def app_main ():
+def sentry_exception (sentry, conf, stats, e, message = None):
+  sentry_tags = {"component": "coneyeye"}
+  logtool.log_fault (e, message = message)
+  data = {
+    "conf": conf,
+    "stats": stats,
+  }
+  if message:
+    data["message"] = message
+  sentry.extra_context (data)
   try:
-    conf = ConfigObj (DEFAULT_CONF, interpolation = False)
+    exc_info = sys.exc_info()
+    rc = sentry.captureException (exc_info, **sentry_tags)
+    LOG.error ("Sentry filed: %s", rc)
+  finally:
+    del exc_info
+
+@logtool.log_call
+def app_main (conf):
+  try:
+    sentry = raven.Client (conf["sentry_dsn"],
+                           auto_log_stacks = True,
+                           transport = "sync",
+                           release = get_versions ()["version"])
     mq_conn = {
       "url": conf.get ("rabbitmq_adminapi_url"),
       "user": conf.get ("rabbitmq_adminapi_user"),
@@ -33,7 +59,8 @@ def app_main ():
                      for s in conf.get ("suppress_queues", "").split(",")]
   except Exception as e:
     logtool.log_fault (e)
-    raise ConfigurationException
+    raise InitialiseException
+  stats = None
   try:
     while True:
       with statsd.StatsClient (**statsd_conn).pipeline() as pipe:
@@ -44,10 +71,11 @@ def app_main ():
         pipe.send ()
       LOG.info ("Sent...")
       time.sleep (delay)
-  except KeyboardInterrupt: # pylint: disable = pointless-except
-    pass
+  except KeyboardInterrupt:
+    raise
   except Exception as e:
-    logtool.log_fault (e)
+    sentry_exception (sentry, conf, stats, e)
+    raise RuntimeException
 
 @logtool.log_call
 def main ():
@@ -55,13 +83,19 @@ def main ():
     logging.config.fileConfig (DEFAULT_LOGCONF,
                                disable_existing_loggers = False)
     setproctitle.setproctitle (DEFAULT_PROCNAME)
-    app_main ()
-  except ConfigurationException as e:
+    conf = ConfigObj (DEFAULT_CONF, interpolation = False)
+    app_main (conf)
+  except InitialiseException as e:
     print >> sys.stderr, "Configuration problem.  See logs for details."
-  except KeyboardInterrupt: # pylint: disable = pointless-except
-    pass
+    sys.exit (1)
+  except KeyboardInterrupt:
+    sys.exit (0)
+  except RuntimeException:
+    LOG.error ("Exiting...")
+    sys.exit (1)
   except Exception as e:
     logtool.log_fault (e)
+    LOG.error ("Exiting...")
     sys.exit (1)
 
 if __name__ == "__main__":
