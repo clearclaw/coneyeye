@@ -44,7 +44,7 @@ def app_main ():
         pipe.send ()
       LOG.info ("Sent...")
       time.sleep (delay)
-  except KeyboardInterrupt:
+  except KeyboardInterrupt: # pylint: disable = pointless-except
     pass
   except Exception as e:
     logtool.log_fault (e)
@@ -58,7 +58,7 @@ def main ():
     app_main ()
   except ConfigurationException as e:
     print >> sys.stderr, "Configuration problem.  See logs for details."
-  except KeyboardInterrupt:
+  except KeyboardInterrupt: # pylint: disable = pointless-except
     pass
   except Exception as e:
     logtool.log_fault (e)
