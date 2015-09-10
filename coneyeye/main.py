@@ -22,7 +22,7 @@ class RuntimeException (Exception):
 def sentry_exception (conf, stats, e, message = None):
   sentry = raven.Client (conf["sentry_dsn"],
                          auto_log_stacks = True,
-                         transport = "sync",
+                         transport = raven.transport.requests,
                          release = get_versions ()["version"])
   sentry_tags = {"component": "coneyeye"}
   logtool.log_fault (e, message = message)
