@@ -19,7 +19,11 @@ class RuntimeException (Exception):
   pass
 
 @logtool.log_call
-def sentry_exception (sentry, conf, stats, e, message = None):
+def sentry_exception (conf, stats, e, message = None):
+  sentry = raven.Client (conf["sentry_dsn"],
+                         auto_log_stacks = True,
+                         transport = "sync",
+                         release = get_versions ()["version"])
   sentry_tags = {"component": "coneyeye"}
   logtool.log_fault (e, message = message)
   data = {
@@ -39,10 +43,8 @@ def sentry_exception (sentry, conf, stats, e, message = None):
 @logtool.log_call
 def app_main (conf):
   try:
-    sentry = raven.Client (conf["sentry_dsn"],
-                           auto_log_stacks = True,
-                           transport = "sync",
-                           release = get_versions ()["version"])
+    if not conf.get["sentry_dsn"]:
+      raise InitialiseException ("Missing configuration: sentry_dsn")
     mq_conn = {
       "url": conf.get ("rabbitmq_adminapi_url"),
       "user": conf.get ("rabbitmq_adminapi_user"),
@@ -61,8 +63,8 @@ def app_main (conf):
     logtool.log_fault (e)
     raise InitialiseException
   stats = None
-  try:
-    while True:
+  while True:
+    try:
       with statsd.StatsClient (**statsd_conn).pipeline() as pipe:
         stats = mqreport (mq_conn, ignore_queues = ignore_queues)
         LOG.info (json.dumps (stats, indent = 2))
@@ -71,11 +73,12 @@ def app_main (conf):
         pipe.send ()
       LOG.info ("Sent...")
       time.sleep (delay)
-  except KeyboardInterrupt:
-    raise
-  except Exception as e:
-    sentry_exception (sentry, conf, stats, e)
-    raise RuntimeException
+    except KeyboardInterrupt:
+      raise
+    except Exception as e:
+      sentry_exception (conf, stats, e)
+      LOG.info ("Sleeping for a minute...")
+      time.sleep (60)
 
 @logtool.log_call
 def main ():

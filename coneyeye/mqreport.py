@@ -1,13 +1,14 @@
 #! /usr/bin/env python
 
 from __future__ import absolute_import
-import fnmatch, logging, logtool, requests
+import fnmatch, logging, logtool, requests, retryp
 from addict import Dict
 from .flattendict import flatten_dict
 
 LOG = logging.getLogger (__name__)
 logging.basicConfig (level = logging.WARN)
 
+@retryp.retryp (expose_last_exc = True)
 @logtool.log_call
 def get_data (mq_conn, endpoint):
   url = "{url}{endpoint}".format (endpoint = endpoint, **mq_conn)
