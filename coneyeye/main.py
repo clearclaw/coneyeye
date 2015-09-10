@@ -43,7 +43,7 @@ def sentry_exception (conf, stats, e, message = None):
 @logtool.log_call
 def app_main (conf):
   try:
-    if not conf.get["sentry_dsn"]:
+    if not conf.get ("sentry_dsn"):
       raise InitialiseException ("Missing configuration: sentry_dsn")
     mq_conn = {
       "url": conf.get ("rabbitmq_adminapi_url"),
