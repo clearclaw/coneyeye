@@ -7,5 +7,6 @@ path.py
 rainbow_logging_handler
 raven
 requests
+retryp
 setproctitle
 statsd
