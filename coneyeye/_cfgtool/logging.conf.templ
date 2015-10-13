@@ -1,5 +1,5 @@
 [loggers]
-keys = logtool, requests, root, statsd
+keys = logtool, root
 
 [handlers]
 keys = console, console_colour, syslog
@@ -8,56 +8,32 @@ keys = console, console_colour, syslog
 keys = generic, colour
 
 [logger_root]
-level = DEBUG
-handlers = ${coneyeye_log_handler}
+level = ${coneyeye.log_level}
+handlers = ${coneyeye.log_handler}
 
 [logger_logtool]
-level = DEBUG
-handlers = ${coneyeye_log_handler}
+level = ${coneyeye.log_level_logtool}
+handlers = ${coneyeye.log_handler}
 qualname = logtool
-propagate = 0
-
-[logger_logtool.log_wrap]
-level = DEBUG
-handlers = ${coneyeye_log_handler}
-qualname = logtool.log_wrap
-propagate = 0
-
-[logger_logtool.log_fault_impl]
-level = DEBUG
-handlers = ${coneyeye_log_handler}
-qualname = logtool.log_fault_impl
-propagate = 0
-
-[logger_requests]
-level = DEBUG
-handlers = ${coneyeye_log_handler}
-qualname = requests
-propagate = 0
-
-[logger_statsd]
-level = WARN
-handlers = ${coneyeye_log_handler}
-qualname = statsd
 propagate = 0
 
 [handler_console]
 class = StreamHandler
-level = DEBUG
+level = ${coneyeye.log_level}
 formatter = generic
 args = ()
 
 [handler_console_colour]
 class = rainbow_logging_handler.RainbowLoggingHandler
 stream = sys.stderr
-level = DEBUG
+level = ${coneyeye.log_level}
 args = (sys.stderr, "")
 
 [handler_syslog]
 class = handlers.SysLogHandler
-level = DEBUG
+level = ${coneyeye.log_level}
 formatter = generic
-args = (('127.0.0.1', handlers.SYSLOG_UDP_PORT), handlers.SysLogHandler.LOG_LOCAL3)
+args = (("${coneyeye.syslog_host}", handlers.SYSLOG_UDP_PORT), handlers.SysLogHandler.LOG_${coneyeye.syslog_facility})
 
 [formatter_generic]
 class = logging.Formatter
