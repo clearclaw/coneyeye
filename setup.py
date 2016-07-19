@@ -14,7 +14,7 @@ setup (
     keywords = "RabbitMQ, StatsD, daemon",
     author = "J C Lawrence",
     author_email = "claw@kanga.nu",
-    url = "git@github.com:clearclaw/coneyeye.git",
+    url = "https://github.com/clearclaw/coneyeye",
     license = "GPL v3.0",
     packages = find_packages (exclude = ["tests"]),
     package_data = {"coneyeye": ["_cfgtool/coneyeye",
