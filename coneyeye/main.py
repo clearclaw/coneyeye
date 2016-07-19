@@ -39,7 +39,7 @@ def sentry_exception (conf, stats, e, message = None):
   finally:
     del exc_info
 
-@logtool.log_call
+@logtool.log_call (log_args = False)
 def app_main (conf):
   try:
     if not conf.get ("sentry_dsn"):
